@@ -1,0 +1,113 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: times new roman,times,serif;
+    color: rgb(8, 78, 48);
+    background: #fff;
+  }
+  
+  .container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem;
+  }
+  
+  .name {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+  
+  .intro {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+  }
+  
+  .bio {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 2rem;
+  }
+  
+  .social-links {
+    margin-bottom: 3rem;
+    font-size: 1rem;
+  }
+  
+  .social-links a {
+    text-decoration: none;
+    color: #0d7a2c;
+  }
+  
+  .work h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .work ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  .work li {
+    margin-bottom: 0.75rem;
+  }
+  
+  .footer {
+    font-size: 0.9rem;
+    color: #0d7a2c;
+  }
+  
+  /* Style for the email link */
+.email-link {
+    /* This ensures the email text is aligned with the rest of the content */
+    /* Assuming your other text content is centered or left-aligned */
+    /* If your other content is centered, you might not need this explicitly. */
+    /* text-align: center; */
+    
+    /* You may want to control the margin/spacing around the email */
+    margin-top: -1rem; /* Example: Pull it up closer to the name */
+    margin-bottom: 2rem;
+}
+
+.email-link a {
+    /* Highlighting the link in a shade of green (matches the viewport) */
+    color: #006400; /* Dark Green */
+    /* Or a lighter green, depending on your preference */
+    /* color: #38761d; */ 
+    
+    /* Remove underline */
+    text-decoration: none; 
+    
+    /* Adjust font size if necessary to match the surrounding text */
+    /* font-size: 1rem; */
+}
+
+/* Optional: Add an effect on hover for interactivity */
+.email-link a:hover {
+    text-decoration: underline;
+    opacity: 0.8;
+}
+
+.publications ul {
+    list-style-type: none; /* removes default bullets */
+    padding-left: 0;
+  }
+
+  .publications li {
+    margin-bottom: 1.2em; /* adds spacing between publications */
+    line-height: 1.4em;
+  }
+
+  .publications a {
+    color: green;           /* link text color */
+    text-decoration: none;  /* remove underline, optional */
+  }
+
+  .publications a:hover {
+    text-decoration: underline; /* underline on hover */
+  }
+
+  .publications em {
+    color: #555;            /* slightly lighter for venue/year */
+  }

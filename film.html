@@ -1,0 +1,145 @@
+<section id="film-portfolio">
+    <h2 class="section-header">Film Portfolio</h2>
+  
+    <div class="portfolio-section">
+      <h3>Short Films</h3>
+      <div class="portfolio-grid">
+        <div class="portfolio-item">
+          <a href="https://drive.google.com/file/d/1lTlHfpKwVOSWSrs-xPN6CPrV1_BEJvV0/view?usp=sharing" target="_blank">
+            <img src="thumbnails/goodbye.png" alt="GoodBye Dorm Video">
+          </a>
+          <h4>Davidson 405</h4>
+          <p>Made a goodbye video for my freshman dorm</p>
+        </div>
+        <div class="portfolio-item">
+          <a href="https://drive.google.com/file/d/1YDN_hn4ruxx5zDE7mBzT55syjPgZmEE_/view?usp=sharing" target="_blank">
+            <img src="thumbnails/nike.png" alt="Nike Just Wear It">
+          </a>
+          <h4>Nike: Just Wear It</h4>
+          <p>An exaggerated experience from my time in the Nike Store. Sincere apologies to anyone who decides to willingly watch this.</p>
+        </div>
+      </div>
+    </div>
+  
+    <div class="portfolio-section">
+      <h3>Scripts</h3>
+      <ul class="clean-list">
+        <li><a href="scripts/just_wear_it.pdf" target="_blank">Script: Nike, Just Wear It</a></li>
+        <li><a href="scripts/bus_60.pdf" target="_blank">Script: Bus 60</a></li>
+      </ul>
+    </div>
+  
+    <div class="portfolio-section">
+      <h3>Photography & Visual Experiments</h3>
+      <p class="coming-soon">(Coming Soon) Dark Room Photography & Visual Experiments</p>
+    </div>
+  
+    <div class="portfolio-section">
+      <h3>Film Analysis / Blog</h3>
+      <ul class="clean-list">
+        <li><p class="coming-soon">(Coming Soon) Scene Analysis: Taxi Driver – Camera Angles & Perspective</p></li>
+        <li><a href="film_blogs/visual-storytelling.html" target="_blank">Visual Storytelling Notes – Experimental Shorts</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <style>
+    /* 1. Base Container & Typography */
+    #film-portfolio {
+      max-width: 1000px; /* Slightly wider */
+      margin: 0 auto;
+      font-family: 'Inter', sans-serif; /* Assume Inter font is linked */
+      color: #333; /* Darker text for readability */
+      padding: 0 20px; /* Padding for mobile view */
+      line-height: 1.6;
+    }
+    
+    .section-header {
+        text-align: center;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 50px;
+        letter-spacing: 0.05em; /* Subtle spacing */
+        color: #2c3e50; /* A dark, professional blue-gray */
+    }
+
+    h3 {
+        font-size: 1.5rem;
+        border-bottom: 2px solid #ecf0f1; /* Light gray separator */
+        padding-bottom: 8px;
+        margin-bottom: 20px;
+        font-weight: 600;
+        color: #34495e;
+    }
+    
+    /* 2. Anchor Links & Colors */
+    a {
+      color: #1abc9c; /* A fresh, appealing Teal/Cyan green */
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    a:hover {
+      color: #16a085; /* Darker hover state */
+      text-decoration: none; /* Keep links clean, only change color */
+    }
+
+    /* 3. Portfolio Grid (Short Films) */
+    .portfolio-section {
+      margin-bottom: 60px;
+    }
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Better responsiveness */
+      gap: 30px; /* Increased gap */
+    }
+    .portfolio-item {
+      text-align: left; /* Align text left under the thumbnail */
+      background: #fdfdfd;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      overflow: hidden; /* Contains the image border radius */
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Subtle lift */
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+      padding-bottom: 15px;
+    }
+    .portfolio-item:hover {
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      transform: translateY(-5px); /* Lift effect on hover */
+    }
+    .portfolio-item a {
+        display: block;
+    }
+    .portfolio-item img {
+      width: 100%;
+      height: auto;
+      border-radius: 0; /* Remove radius here, applied to parent */
+      display: block;
+    }
+    .portfolio-item h4 {
+        font-size: 1.15rem;
+        margin: 10px 15px 5px 15px; /* Spacing */
+        color: #2c3e50;
+    }
+    .portfolio-item p {
+        font-size: 0.95rem;
+        color: #7f8c8d;
+        margin: 0 15px;
+    }
+
+    /* 4. Lists & Coming Soon */
+    .clean-list {
+        list-style-type: none; /* Remove bullet points */
+        padding-left: 0;
+    }
+    .clean-list li {
+        margin-bottom: 10px;
+        padding: 5px 0;
+        border-bottom: 1px dashed #ecf0f1;
+    }
+    .coming-soon {
+        color: #95a5a6; /* Muted gray text */
+        font-style: italic;
+        margin-top: 5px;
+        display: block;
+    }
+</style>

@@ -4,73 +4,60 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Sneha Muppalla — Film Portfolio</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <style>
-    /* Minimal specific styling to layout thumbnails cleanly without breaking home page rules */
-    .film-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 1.5rem;
-      margin-top: 1rem;
-    }
-    .film-item img {
-      width: 100%;
-      height: auto;
-      margin-bottom: 0.5rem;
-    }
-    .film-item h4 {
-      margin: 0;
-      font-size: 1rem;
-      font-weight: 600;
-    }
-    .film-item p {
-      margin-top: 0.25rem;
-      font-size: 0.875rem;
-    }
-    .back-home {
-      display: inline-block;
-      margin-bottom: 2rem;
-      font-size: 0.875rem;
-    }
-  </style>
 </head>
 <body>
   <main class="container">
 
-    <a href="index.html" class="back-home">← back to home</a>
-
-    <h1 class="name">Film Portfolio</h1>
+    <h1 class="name"><a class="name-link" href="index.html">Sneha Muppalla</a></h1>
+    <p class="email-link">
+      <a href="mailto:smuppalla06@berkeley.edu">smuppalla06[at]berkeley[dot]edu</a>
+    </p>
     <p class="intro">
       I screenwrite, direct short films, and also do cinematography analysis.
     </p>
 
+    <nav class="social-links" aria-label="Site links">
+      <a href="index.html">home</a> ·
+      <a href="https://github.com/sneha-muppalla" target="_blank" rel="noopener noreferrer">github</a> ·
+      <a href="https://www.linkedin.com/in/sneha-muppalla-13b068282/" target="_blank" rel="noopener noreferrer">linkedin</a> ·
+      <a href="https://huggingface.co/flying101" target="_blank" rel="noopener noreferrer">huggingface</a> ·
+      <span aria-current="page">film</span> ·
+      <a href="https://www.youtube.com/@snehamuppalla680/playlists" target="_blank" rel="noopener noreferrer">paper readings</a>
+    </nav>
+
     <!-- Short Films Section -->
     <section class="publications">
       <h2>Short Films</h2>
-      <div class="film-grid">
-        <div class="film-item">
-          <a href="https://drive.google.com/file/d/1lTlHfpKwVOSWSrs-xPN6CPrV1_BEJvV0/view?usp=sharing" target="_blank">
-            <img src="thumbnails/goodbye.png" alt="GoodBye Dorm Video">
+      <ul class="film-list">
+        <li class="film-item">
+          <a href="https://drive.google.com/file/d/1lTlHfpKwVOSWSrs-xPN6CPrV1_BEJvV0/view?usp=sharing" target="_blank" rel="noopener noreferrer">
+            <img src="thumbnails/goodbye.png" alt="Still from Davidson 405">
           </a>
-          <h4>Davidson 405</h4>
-          <p class="details">A cinematic goodbye sequence documenting my freshman dorm environment.</p>
-        </div>
-        <div class="film-item">
-          <a href="https://drive.google.com/file/d/1YDN_hn4ruxx5zDE7mBzT55syjPgZmEE_/view?usp=sharing" target="_blank">
-            <img src="thumbnails/nike.png" alt="Nike Just Wear It">
+          <div>
+            <a href="https://drive.google.com/file/d/1lTlHfpKwVOSWSrs-xPN6CPrV1_BEJvV0/view?usp=sharing" target="_blank" rel="noopener noreferrer"><strong>Davidson 405</strong></a><br>
+            <span class="details">A cinematic goodbye sequence documenting my freshman dorm environment.</span>
+          </div>
+        </li>
+        <li class="film-item">
+          <a href="https://drive.google.com/file/d/1YDN_hn4ruxx5zDE7mBzT55syjPgZmEE_/view?usp=sharing" target="_blank" rel="noopener noreferrer">
+            <img src="thumbnails/nike.png" alt="Still from Nike: Just Wear It">
           </a>
-          <h4>Nike: Just Wear It</h4>
-          <p class="details">An exaggerated adaptation of working within retail store spaces.</p>
-        </div>
-        <div class="film-item">
-          <a href="https://drive.google.com/file/d/1cGFdwZ5PFxmqvkL6Es-ux0s0o2FLhd40/view?usp=sharing" target="_blank">
-            <img src="thumbnails/documentary_hair.png" alt="Grow It Forward">
+          <div>
+            <a href="https://drive.google.com/file/d/1YDN_hn4ruxx5zDE7mBzT55syjPgZmEE_/view?usp=sharing" target="_blank" rel="noopener noreferrer"><strong>Nike: Just Wear It</strong></a><br>
+            <span class="details">An exaggerated adaptation of working within retail store spaces.</span>
+          </div>
+        </li>
+        <li class="film-item">
+          <a href="https://drive.google.com/file/d/1cGFdwZ5PFxmqvkL6Es-ux0s0o2FLhd40/view?usp=sharing" target="_blank" rel="noopener noreferrer">
+            <img src="thumbnails/documentary_hair.png" alt="Still from Grow It Forward">
           </a>
-          <h4>Grow It Forward</h4>
-          <p class="details">A documentary about donating hair.</p>
-        </div>
-      </div>
+          <div>
+            <a href="https://drive.google.com/file/d/1cGFdwZ5PFxmqvkL6Es-ux0s0o2FLhd40/view?usp=sharing" target="_blank" rel="noopener noreferrer"><strong>Grow It Forward</strong></a><br>
+            <span class="details">A documentary about donating hair.</span>
+          </div>
+        </li>
+      </ul>
     </section>
 
     <!-- Scripts Section -->

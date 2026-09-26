@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Quantization Through the Lens of CS61C · Sneha Muppalla</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="blog.css">
+</head>
+<body class="reading-page">
+  <main class="container article">
+    <nav aria-label="Breadcrumb"><a href="../index.html">Sneha Muppalla</a> <span aria-hidden="true">/</span> <a href="../blog.html">Blog</a></nav>
+    <header>
+      <p class="eyebrow">Field notes / Computer architecture</p>
+      <h1>Quantization<span class="title-subline">through the lens of CS61C</span></h1>
+      <p class="subtitle">Where does floating point come into the picture?</p>
+      <p class="byline"><span class="author-mark" aria-hidden="true">SM</span> Sneha Muppalla <span class="byline-divider">·</span> An illustrated guide in five chapters</p>
+    </header>
+    <details class="about-notes"><summary>From my handwritten notebook <span aria-hidden="true">↗</span></summary><p>Adapted from my handwritten notes, with edits for clarity and technical accuracy. The drawings are my original handwriting; the quantization-error number line is a digital addition.</p></details>
+    <nav class="notebook-downloads" aria-label="Handwritten PDF downloads">
+      <span>Handwritten notes</span>
+      <a href="assets/quantization/originals/quantization-part-1.pdf" target="_blank" rel="noopener">Open Part 1 ↗</a>
+      <a href="assets/quantization/originals/quantization-part-1.pdf" download>Download Part 1</a>
+      <a href="assets/quantization/originals/quantization-part-2.pdf" target="_blank" rel="noopener">Open Part 2 ↗</a>
+      <a href="assets/quantization/originals/quantization-part-2.pdf" download>Download Part 2</a>
+    </nav>
+<nav class="chapter-links" aria-label="Article chapters"><a href="#beyond-exam"><span class="chapter-number">01</span><span class="chapter-label">Beyond the exam</span></a><a href="#range-and-precision"><span class="chapter-number">02</span><span class="chapter-label">Range & precision</span></a><a href="#understanding-quantization"><span class="chapter-number">03</span><span class="chapter-label">Quantization</span></a><a href="#costs-and-benefits"><span class="chapter-number">04</span><span class="chapter-label">Fewer bits</span></a><a href="#closing"><span class="chapter-number">05</span><span class="chapter-label">Closing</span></a></nav>
+<div class="reader-controls" hidden>
+      <div class="reader-toolbar"><label for="chapter-select">Section</label><select id="chapter-select" aria-label="Choose an article section"><option value="beyond-exam">1. Why floating points matter beyond an exam</option><option value="range-and-precision">2. Range vs precision</option><option value="understanding-quantization">3. What quantization means</option><option value="costs-and-benefits">4. The Costs and Benefits of fewer bits</option><option value="closing">5. Closing</option></select><button type="button" id="reader-mode" aria-pressed="false">Read all</button></div>
+      <div class="reader-status"><span id="chapter-status" aria-live="polite"></span><progress id="chapter-progress" max="5" value="1" aria-label="Position in article"></progress></div>
+    </div>
+<section class="reader-chapter" id="beyond-exam" aria-labelledby="beyond-exam-title">
+<h2 id="beyond-exam-title" tabindex="-1"><span class="section-kicker">CHAPTER 01</span>Why floating points matter beyond an exam</h2>
+<div class="chapter-intro" id="why">
+      <p>Why does converting between decimal and IEEE 754 matter beyond an exam?</p>
+      <p>If you’ve taken a 61C exam, you have probably converted a decimal number into IEEE 754 by hand:</p>
+      <ol class="steps"><li>Determine the sign.</li><li>Normalize the binary value.</li><li>Calculate the biased exponent.</li><li>Fill in the fraction bits.</li></ol>
+      <p>It often feels like an isolated mechanical exercise you can master for an exam, instead of an actual decision that affects real software out there.</p>
+      <blockquote>BUT, the format used to represent a number changes what a computer can do with it.</blockquote></div>
+<details class="chapter-topic" id="review"><summary>CS61C review</summary><div class="topic-body">
+      <p>So far, we have seen fixed-point binary representations and IEEE 754 floating-point representations. As a quick review, a simple 6-bit representation in binary point for positive numbers is:</p>
+      <figure class="small-figure"><img src="assets/quantization/binary-point.png" width="820" height="250" alt="Six bits arranged as xx.yyyy, with place values 2 to the 1, 0, minus 1, minus 2, minus 3, and minus 4."><figcaption>A 6-bit binary-point representation.</figcaption></figure>
+      <details class="diagram-text"><summary>Read the diagram as text</summary>
+        <p>The six bits <code>xxyyyy</code> are interpreted as <code>xx.yyyy</code>. From left to right, their place values are 2<sup>1</sup>, 2<sup>0</sup>, 2<sup>−1</sup>, 2<sup>−2</sup>, 2<sup>−3</sup>, and 2<sup>−4</sup>.</p>
+      </details>
+      <p>Floating point lets us store an approximation of a real number using binary scientific notation. Here I’m focusing on FP32, the 32-bit format we work with in CS61C.</p>
+      <details class="diagram-text"><summary>A note on float and double</summary><p>In C and C++, <code>float</code> is typically 32-bit and <code>double</code> is typically 64-bit. Java defines them as 32-bit and 64-bit, respectively. Python’s built-in <code>float</code> ordinarily uses double precision.</p></details>
+      <p>In CS61C, we teach the 32-bit IEEE 754 single-precision format:</p>
+      <figure><img src="assets/quantization/float-layout.png" width="1590" height="300" alt="Handwritten 32-bit single-precision layout: sign at bit 31, exponent at bits 30 through 23, and fraction field at bits 22 through 0 (labeled significand in the original drawing)."><figcaption>The single-precision layout from my notes. The field labeled “significand” in this drawing is the stored fraction field.</figcaption></figure>
+      <details class="diagram-text"><summary>Read the diagram as text</summary>
+        <p>An FP32 value occupies a 32-bit word:</p><ul><li>Bit 31: one sign bit.</li><li>Bits 30–23: eight exponent bits.</li><li>Bits 22–0: 23 fraction bits.</li></ul><p>The handwritten label “Significand” refers to the stored fraction field. For normalized values, the full significand also includes the implicit leading 1.</p>
+      </details>
+      <p>I’ll call the stored field the fraction, although it is sometimes informally called the mantissa in class and online. For normalized values, the significand includes the implicit leading 1.</p>
+      <p>For normalized finite values, the decimal value is:</p>
+      <div class="equation" role="math" aria-label="Negative one to the sign power, times binary one point f, times two to the stored exponent minus bias power">(−1)<sup>s</sup> × (1.f)<sub>2</sub> × 2<sup>e − bias</sup></div>
+      <p>Here, s is the sign bit, f is the stored fraction, and e is the stored exponent. The bias is 127 for FP32. Zero, subnormal values, infinities, and NaNs need separate treatment.</p></div></details>
+<details class="chapter-topic" id="tradeoffs"><summary>Four things to consider</summary><div class="topic-body">
+      <p>Given a fixed number of bits, we must decide how to divide them among the sign, exponent, and fraction. That decision affects four properties: range, precision, storage, and hardware execution.</p>
+      <dl class="tradeoffs"><div><dt>01 / Range</dt><dd>The span of magnitudes the format can represent.</dd></div><div><dt>02 / Precision</dt><dd>How closely we can distinguish nearby values.</dd></div><div><dt>03 / Storage</dt><dd>How many bytes every value occupies.</dd></div><div><dt>04 / Execution</dt><dd>Hardware instructions that can process the value efficiently.</dd></div></dl>
+      <p>These choices have become very visible in machine learning. Modern models can contain millions or billions of parameters. Now if we follow the standard taught in 61C, then each numerical parameter occupies 4 bytes (32 bits).</p></div></details>
+<details class="chapter-topic" id="model-storage"><summary>What if each parameter used fewer bits?</summary><div class="topic-body">
+      <p>Here’s some math: if we have a 1 billion parameter model, then it takes up</p>
+      <div class="equation">10<sup>9</sup> parameters × 4 bytes per parameter ≈ 4 GB</div>
+      <p>I’m counting weights and biases here, using decimal GB. This is just the space for the parameters—we’ll come back to the scales, KV cache, activations, and other memory the model needs to run.</p>
+      <p>What if each parameter occupied 2 bytes? In other words, what would happen if each numerical parameter was represented in 16 bits instead of 32? Then that would approximately halve the storage. And then what about one byte (8 bits)? It reduces the size again by ½ to 1 GB space.</p>
+      <p>These different representations change how much data overall must travel through memory and whether the processor has instructions designed for that datatype (32 bits, 16 bits, 8 bits, etc.).</p>
+      <p>This is why machine learning uses formats such as FP32, FP16, BF16, FP8, INT8. But what do all these names actually mean and why do we need so many formats? Are they simply just cutting off a few decimal places? Not exactly.</p>
+      <p>Each of these formats makes a different compromise in range, memory, precision, and hardware execution. Here’s a diagram of representing one of my favorite numbers (well, it’s in decimal in this case) in 3 ways:</p>
+      <figure data-source="Part 1, page 4"><a href="assets/quantization/formats.png"><img src="assets/quantization/formats.png" width="1237" height="980" loading="lazy" alt="0.93 in three formats: FP32 stores approximately 0.9300000072 in 4 bytes, FP16 approximately 0.9301757813 in 2 bytes, and INT8 stores 118 with a shared scale of 1/127, reconstructing approximately 0.92913."></a><figcaption>0.93 in three formats. Tap to view it larger.</figcaption></figure>
+      <details class="diagram-text"><summary>Read the diagram as text</summary>
+        <p>The mathematical value 0.93 is approximated in three ways:</p><ul><li><strong>FP32:</strong> approximately 0.9300000072, using 4 bytes.</li><li><strong>FP16:</strong> approximately 0.9301757813, using 2 bytes.</li><li><strong>INT8:</strong> integer code 118, using 1 byte plus shared scale metadata. With s = 1/127, q = round(0.93/s) = 118 and x̂ = 118/127 ≈ 0.92913. Code 118 is <code>01110110</code> in binary.</li></ul><p>FP32 and FP16 encode scale through each value’s exponent. INT8 uses separate quantization metadata to reconstruct an approximate real value.</p>
+      </details></div></details>
+</section>
+<section class="reader-chapter" id="range-and-precision" aria-labelledby="range-and-precision-title">
+<h2 id="range-and-precision-title" tabindex="-1"><span class="section-kicker">CHAPTER 02</span>Range vs precision</h2>
+<div class="chapter-intro" id="range-precision">
+      <p>Here’s a quick review of floating point formats from CS61C: floating point formats are able to represent extremely large values and small differences between these nearby values by dividing their available bits into three fields:</p>
+      <div class="equation">(−1)<sup>s</sup> × (1.f)<sub>2</sub> × 2<sup>e − bias</sup></div>
+      <p>For ordinary normalized values:</p>
+      <ul><li><strong>s</strong> determines sign.</li><li><strong>e</strong> determines scale of the number.</li><li><strong>f</strong> determines precision within that scale.</li></ul>
+      <p>A useful interpretation I tell students is that the exponent chooses the general “neighborhood” on this number line, while the fraction f chooses the specific position within that neighborhood.</p>
+      <p>There are tradeoffs with deciding between more bits for exponent or more bits for the fraction.</p>
+      <h3>1. Exponent bits provide range</h3>
+      <p>More exponent bits provide a wider range. This is why BF16 has approximately the same numerical range as FP32: both utilize 8 bits for the exponent.</p>
+      <figure><a href="assets/quantization/range.png"><img src="assets/quantization/range.png" width="1040" height="430" loading="lazy" alt="Conceptual number lines: fewer exponent bits cover a smaller range around zero; more exponent bits cover a wider range."></a></figure>
+      <details class="diagram-text"><summary>Read the diagram as text</summary>
+        <p>The first number line illustrates a smaller range, with endpoints labeled −2<sup>N</sup> and 2<sup>N</sup>. The second illustrates a wider range, labeled −2<sup>M</sup> and 2<sup>M</sup>, where M &gt; N. These are conceptual ranges: more exponent bits allow a wider span of magnitudes.</p>
+      </details>
+      <h3>2. Fraction bits provide precision</h3>
+      <figure><a href="assets/quantization/precision.png"><img src="assets/quantization/precision.png" width="1090" height="530" loading="lazy" alt="Two number lines from 0.9 to 1.0. More fraction bits provide many nearby values; fewer fraction bits leave wider gaps. Values between available points must be rounded."></a></figure>
+      <details class="diagram-text"><summary>Read the diagram as text</summary>
+        <p>Both number lines span 0.9 to 1.0. More fraction bits provide many closely spaced representable values. Fewer fraction bits leave wider gaps. If the exact value falls between two available points, it must be rounded.</p>
+      </details>
+      <p>The FP16 format stores 10 fraction bits, while BF16 stores seven. So BF16 instead spends more of its limited bit budget on exponent range.</p>
+      <aside class="sample-note"><strong>Quick note:</strong> BF16 stands for <strong>bfloat16</strong>, or “brain floating point.” Google Brain developed it for machine-learning workloads. Although BF16 and IEEE FP16 are both 16-bit floating-point formats, they divide their exponent and fraction bits differently.</aside>
+      <ul><li><strong>FP16:</strong> more fraction bits, narrower range.</li><li><strong>BF16:</strong> fewer fraction bits, wider range.</li></ul>
+      <h3>3. Total bits determine storage</h3>
+      <p>The total width (bits) determines how much memory each stored value occupies:</p>
+      <div class="table-wrap"><table><caption>Storage per value, using the formats discussed in these notes</caption><thead><tr><th scope="col">Format</th><th scope="col">Bits</th><th scope="col">Bytes per value</th></tr></thead><tbody><tr><th scope="row">FP32</th><td>32</td><td>4</td></tr><tr><th scope="row">FP16 / BF16</th><td>16</td><td>2</td></tr><tr><th scope="row">FP8 / INT8</th><td>8</td><td>1</td></tr><tr><th scope="row">INT4</th><td>4</td><td>½, when packed</td></tr></tbody></table></div>
+      <p>8-bit floating point formats (FP8) further push the same tradeoff as FP16 and BF16. For example, FP8 E4M3 (M denotes mantissa bits, still corresponding to the stored fraction field) has more bits for precision than E5M2. I’ll leave FP8 for now, so I can further explain the basics of quantization from here!</p></div>
+</section>
+<section class="reader-chapter" id="understanding-quantization" aria-labelledby="understanding-quantization-title">
+<h2 id="understanding-quantization-title" tabindex="-1"><span class="section-kicker">CHAPTER 03</span>What quantization means</h2>
+<div class="chapter-intro" id="quantization">
+      <p>Now for the fun juicy stuff: quantization!</p>
+      <blockquote>Quantization maps values from a larger set of possible numerical values onto a smaller set of representable values.</blockquote>
+      <p>This can happen in many ways:</p>
+      <ul><li>An FP32 value can be rounded to a value representable in FP16, BF16, or FP8.</li><li>A floating point can also be represented by an integer and a shared scale.</li><li>Weights can be restricted to an EVEN smaller set, such as binary values {−1, +1} or ternary values {−1, 0, +1}.</li></ul></div>
+<details class="chapter-topic" id="fp16"><summary>FP32 → FP16: reducing floating-point precision</summary><div class="topic-body">
+      <p>Consider 0.93. Its FP32 representation is</p>
+      <pre aria-label="FP32 bit representation"><code>0 | 01111110 | 11011100001010001111011
+s | exponent | fraction</code></pre>
+      <p>This stored FP32 exponent is 126. Subtract bias of 127; the unbiased exponent is now 126 − 127 = −1.</p>
+      <p>FP16 must now represent the same exponent using its bias of 15: −1 + 15 = 14. 14 in five bits is <code>01110</code>.</p>
+      <p>FP16 stores only 10 fraction bits instead of FP32’s 23. The fraction is shortened and rounded to <code>1101110001</code>.</p>
+      <p>The resulting FP16 representation is:</p>
+      <pre aria-label="FP16 bit representation"><code>0 | 01110    | 1101110001
+s | exponent | fraction</code></pre>
+      <p>This bit pattern now represents <strong>0.93017578125</strong>. This conversion maps the FP32 approximation of 0.93 to the nearest available FP16 value. Next, let’s see how integer quantization works differently.</p></div></details>
+<details class="chapter-topic" id="int8"><summary>Floating point → INT8: integer codes and a shared scale</summary><div class="topic-body">
+      <p>INT8 representation is different. Before applying a scale, adjacent representable INT8 values differ by 1 (−2, −1, 0, 1, 2, …). Signed INT8 stores integers from −128 to 127.</p>
+      <p>However, neural network weights often look like 0.037, −0.62, or of course 0.93 lol. So if hardware only supports INT8, how can an integer format store them?</p>
+      <p>We can’t just convert small weights to integers, that would just destroy most of the information: 0.93 → 1, 0.26 → 0, −0.26 → 0. Many different values will just collapse to a small integer.</p>
+      <blockquote>The key idea here is an integer does not have to mean “one whole unit.”</blockquote>
+      <p>If you have a scale s, then one integer step can instead represent a smaller real-valued interval.</p>
+      <p>Here, I assume symmetric quantization over approximately [−1, 1], using integer codes from −127 to 127. To map these endpoints, we’ll set the scale s to</p>
+      <div class="equation">s = 1 / 127 ≈ 0.00787</div>
+      <p>Now we can interpret integer 1 as approximately 0.00787, 10 as 0.0787, 127 as 1.0.</p>
+      <p>To store 0.93, the q representation for INT8 would be</p>
+      <div class="equation">q = round(0.93 / (1 / 127)) = 118</div>
+      <p>And to reconstruct we do</p>
+      <div class="equation">x̂ = 118 × (1 / 127) ≈ 0.929</div>
+      <figure><a href="assets/quantization/int8-ruler.png"><img src="assets/quantization/int8-ruler.png" width="1110" height="710" loading="lazy" alt="A real-value ruler from minus 1 to 1 maps to an integer ruler from minus 127 to 127. The real value 0.93 maps to integer 118 using a shared scale."></a></figure>
+      <details class="diagram-text"><summary>Read the diagram as text</summary>
+        <p>The real-value ruler runs from −1 to 1, while the integer-code ruler runs from −127 to 127. With a shared scale of 1/127, the value 0.93 maps to code 118.</p><p>Individual weights no longer need their own exponent and fraction fields. The drawing highlights approximation error; shared scale metadata is also required.</p>
+      </details>
+      <p>With floating point, each value gets its own exponent. In this INT8 example, a group of values shares a scale instead. We save space, but we still have to store that scale, and we don’t get exactly 0.93 back.</p></div></details>
+<details class="chapter-topic" id="error"><summary>Reconstruction and quantization error</summary><div class="topic-body">
+      <p>Given an original weight w and scale s, we can calculate the integer to store as</p>
+      <div class="equation">q = round(w / s)</div>
+      <p>For this example, zero stays zero, and I’m assuming the rounded code fits in our integer range. If it falls outside that range, we need to clip it. You may also see quantization formulas with an extra offset called a zero-point; I’m leaving that at 0 here.</p>
+      <p>Here, w is the original value, s is the scale, and q is the integer we store. To get an approximation of w back:</p>
+      <div class="equation">ŵ = sq</div>
+      <p>Reconstruction opens up one issue, which is quantization error: the difference between an original value and its reconstructed approximation, where</p>
+      <div class="equation">ε = w − ŵ<br>|ε| = |w − ŵ|</div>
+      <p>For a simple example, choose s = 0.1 with zero-point 0, and round to the nearest integer code:</p>
+      <div class="table-wrap"><table><caption>Reconstruction with a scale of 0.1</caption><thead><tr><th scope="col">Original w</th><th scope="col">Code q</th><th scope="col">Reconstructed ŵ</th><th scope="col">|ε|</th></tr></thead><tbody><tr><td>−0.26</td><td>−3</td><td>−0.30</td><td>0.04</td></tr><tr><td>0.04</td><td>0</td><td>0.00</td><td>0.04</td></tr><tr><td>0.73</td><td>7</td><td>0.70</td><td>0.03</td></tr></tbody></table></div>
+      <figure><img src="assets/quantization/quantization-error.svg" width="720" height="310" loading="lazy" alt="Three number-line examples with levels spaced 0.1 apart. Minus 0.26 rounds to minus 0.30; 0.04 rounds to 0; and 0.73 rounds to 0.70. Arrows show the displacement caused by rounding."><figcaption>Each value snaps to its nearest representable level. The distance moved is the absolute quantization error.</figcaption></figure>
+      <p>Quantization loses information because multiple original values can map to the same stored code. The scale determines the spacing between representable values and the range they cover: smaller steps can reduce rounding error, but cover a narrower range for a fixed integer width.</p></div></details>
+<details class="chapter-topic" id="scaling"><summary>How widely should a scale be shared?</summary><div class="topic-body">
+      <figure><a href="assets/quantization/weight-matrix.png"><img src="assets/quantization/weight-matrix.png" width="1350" height="1100" loading="lazy" alt="A linear layer has weight matrix W in R to the power d-out by d-in. Each row corresponds to one output feature, and each column to one input feature. The example shows a four-by-four matrix."></a></figure>
+      <details class="diagram-text"><summary>Read the diagram as text</summary>
+        <p>Let’s consider a linear layer with weight matrix W ∈ ℝ<sup>d<sub>out</sub> × d<sub>in</sub></sup>. Each row corresponds to one output feature, and each column to one input feature.</p><pre><code>        Input features →
+w₁₁  w₁₂  w₁₃  w₁₄
+w₂₁  w₂₂  w₂₃  w₂₄
+w₃₁  w₃₂  w₃₃  w₃₄
+w₄₁  w₄₂  w₄₃  w₄₄</code></pre><p>Output features run down the rows.</p>
+      </details>
+      <p>A scale can be applied at different levels of scale granularity:</p>
+      <h3>Per-tensor scaling</h3>
+      <figure><a href="assets/quantization/per-tensor.png"><img src="assets/quantization/per-tensor.png" width="1140" height="285" loading="lazy" alt="All tensor weights share scale 1, which must accommodate the complete value range."></a></figure>
+      <details class="diagram-text"><summary>Read the diagram as text</summary>
+        <p>One scale is shared across the entire weight tensor. The scale must accommodate the tensor’s complete value range.</p>
+      </details>
+      <h3>Per-channel scaling</h3>
+      <figure class="small-figure"><a href="assets/quantization/per-channel.png"><img src="assets/quantization/per-channel.png" width="450" height="135" loading="lazy" alt="First row of weights uses scale 1; second row uses scale 2."></a></figure>
+      <details class="diagram-text"><summary>Read the diagram as text</summary>
+        <p>Each channel receives a separate scale. In this row-wise example, [w₁₁, w₁₂, w₁₃] uses scale 1, while [w₂₁, w₂₂, w₂₃] uses scale 2.</p>
+      </details>
+      <p>We can share a scale down a column (an input channel) or across a row (an output channel). Many weight-quantization kernels use one scale per output channel. Which layout you can actually use depends on the runtime and hardware.</p>
+      <h3>Group-wise scaling</h3>
+      <figure><a href="assets/quantization/group-wise.png"><img src="assets/quantization/group-wise.png" width="480" height="180" loading="lazy" alt="One row is divided into two smaller one-dimensional groups, each with a scale."></a></figure>
+      <details class="diagram-text"><summary>Read the diagram as text</summary>
+        <p>Each channel is divided into smaller one-dimensional groups, each with its own scale. In the illustrated row, [w₁₁, w₁₂] is one group and [w₁₃, w₁₄] is another. The colored groups can have different scales, although both handwritten labels say “scale 2.”</p>
+      </details>
+      <h3>Tile-wise scaling</h3>
+      <figure><a href="assets/quantization/tile-wise.png"><img src="assets/quantization/tile-wise.png" width="1200" height="535" loading="lazy" alt="Tile-wise scaling partitions a matrix in two dimensions, so one scale spans multiple rows and columns. This four-by-four matrix is split into four colored two-by-two tiles, each with its own scale."></a></figure>
+      <details class="diagram-text"><summary>Read the diagram as text</summary>
+        <p>Tile-wise scaling partitions the matrix in two dimensions. One scale spans multiple rows and columns. The illustrated four-by-four matrix has four two-by-two tiles:</p><ul><li>Scale 1: rows 1–2, columns 1–2.</li><li>Scale 2: rows 1–2, columns 3–4.</li><li>Scale 3: rows 3–4, columns 1–2.</li><li>Scale 4: rows 3–4, columns 3–4.</li></ul>
+      </details>
+      <p>Smaller groups let us choose a scale that better fits the values in each group. That can reduce error, but now we have more scales to store and apply.</p>
+      <ul><li><strong>Larger groups →</strong> less metadata, potentially more error.</li><li><strong>Smaller groups →</strong> more metadata, potentially less error.</li></ul></div></details>
+<details class="chapter-topic" id="model-components"><summary>What parts of a model can be quantized?</summary><div class="topic-body">
+      <p>During inference, three major categories are commonly quantized:</p>
+      <ol><li><strong>Weights:</strong> learned parameters stored with the model.</li><li><strong>Activations:</strong> temporary intermediate tensors produced while processing the current input.</li><li><strong>KV cache:</strong> attention keys and values retained from earlier tokens so they do not need to be recomputed.</li></ol>
+      <p>KV-cache memory grows with sequence length, batch size, and number of layers; it also depends on the model’s attention dimensions and the cache datatype.</p>
+      <h3>Weight and activation precision</h3>
+      <p>Quantized models are often described using W<sub>x</sub>A<sub>y</sub> notation, where W gives the weight bit width and A gives the activation bit width. Using different formats for different model components is a form of mixed-precision inference.</p>
+      <p>For example, in W8A16, weights can use INT8 to reduce storage and memory traffic, while activations may remain FP16 or BF16 because their input-dependent ranges can make low-bit integer quantization more difficult. Activations can also be quantized, as in the W8A8 example below.</p>
+      <figure><a href="assets/quantization/weight-activation-notation.png"><img src="assets/quantization/weight-activation-notation.png" width="790" height="485" loading="lazy" alt="Handwritten notation and common interpretation table: W8A16 means INT8 weights with FP16 or BF16 activations; W8A8 can mean INT8 or FP8 weights and activations; W4A16 means INT4 weights with FP16 or BF16 activations."></a><figcaption>My handwritten guide to weight and activation notation. Tap to view it larger.</figcaption></figure>
+      <details class="diagram-text"><summary>Read the table as text</summary>
+      <div class="table-wrap"><table><caption>Weight and activation notation</caption><thead><tr><th scope="col">Notation</th><th scope="col">Common interpretation</th></tr></thead><tbody><tr><th scope="row">W8A16</th><td>INT8 weights with FP16 or BF16 activations</td></tr><tr><th scope="row">W8A8</th><td>INT8 weights and activations, or FP8 weights and activations</td></tr><tr><th scope="row">W4A16</th><td>INT4 weights with FP16 / BF16 activations</td></tr></tbody></table></div>
+      </details>
+      <p>The notation alone doesn’t specify the specific format; it only provides the bit width (8-bit, 16-bit, etc.).</p>
+      <p>So a system could use:</p><ul><li>Weights: INT8</li><li>Activations: FP16</li><li>KV cache: FP8</li><li>Selected sensitive operations or accumulations: higher precision</li></ul></div></details>
+</section>
+<section class="reader-chapter" id="costs-and-benefits" aria-labelledby="costs-and-benefits-title">
+<h2 id="costs-and-benefits-title" tabindex="-1"><span class="section-kicker">CHAPTER 04</span>The Costs and Benefits of fewer bits</h2>
+<div class="chapter-intro" id="fewer-bits">
+      <p>During inference, a model’s learned parameters are normally loaded into system / accelerator memory and repeatedly read during execution.</p>
+      <div class="table-wrap"><table><caption>Storage size for a model with one billion parameters</caption><thead><tr><th scope="col">Format</th><th scope="col">Parameter storage</th></tr></thead><tbody><tr><th scope="row">FP32</th><td>≈ 4 GB</td></tr><tr><th scope="row">FP16 / BF16</th><td>≈ 2 GB</td></tr><tr><th scope="row">INT8</th><td>≈ 1 GB</td></tr><tr><th scope="row">INT4</th><td>≈ 0.5 GB</td></tr></tbody></table></div>
+      <p>KV cache is created separately during inference, and stores keys and values from previously processed tokens. As the cache grows with sequence length, batch size, and number of layers, quantizing the KV cache reduces this request-dependent memory, but this is separate from the one billion parameter calculation above.</p>
+      <p>A simple breakdown is:</p>
+      <div class="equation memory-equation">Total active inference memory = parameters + KV cache + temporary activations + runtime workspaces</div>
+      <h3>Connecting quantization to memory hierarchy</h3>
+      <p>CS61C introduces us to the memory hierarchy:</p>
+      <figure><a href="assets/quantization/memory-hierarchy.png"><img src="assets/quantization/memory-hierarchy.png" width="1120" height="155" loading="lazy" alt="Storage to DRAM to cache/SRAM to registers to compute units. The storage end is slower and larger; the register end is faster and smaller."></a><figcaption>Moving data toward the compute units.</figcaption></figure>
+      <details class="diagram-text"><summary>Read the diagram as text</summary>
+        <p>Storage → DRAM → cache / SRAM → registers → compute units.</p><p>The storage end is slower and larger; the register end is faster and smaller. Data must move through the hierarchy to reach the compute units.</p>
+      </details>
+      <p>Before a processor can operate on model parameters, the required data must reach its compute units, but moving all this data can take up a lot of time and energy.</p>
+      <p>Let’s say we have a 64-byte cache line. It can hold either 16 FP32 parameters or 64 INT8 parameters. The same cache line holds 4× as many INT8 parameters. So smaller representations can provide:</p>
+      <ol><li>Less parameter storage.</li><li>Less data transferred from DRAM.</li><li>More values fitting in each cache line.</li><li>Less energy spent moving data.</li></ol>
+      <blockquote>However, a smaller representation DOES NOT automatically lead to faster execution.</blockquote></div>
+<details class="chapter-topic" id="execution"><summary>The cost of using fewer bits</summary><div class="topic-body">
+      <p>The runtime must be able to use the representation efficiently. Some costs include:</p>
+      <ul>
+        <li><strong>Unpacking and dequantization:</strong> extracting packed low-bit values and reconstructing their approximate values when needed.</li>
+        <li><strong>Scale metadata and application:</strong> storing, loading, and applying shared scales.</li>
+        <li><strong>Datatype conversions:</strong> converting between the storage format and the format used for computation.</li>
+        <li><strong>Unsupported low-precision instructions:</strong> hardware may lack native operations for the chosen format.</li>
+        <li><strong>Inefficient kernels:</strong> an implementation may fail to use the hardware efficiently.</li>
+        <li><strong>Padding and alignment:</strong> extra storage or work may be needed to satisfy hardware-layout requirements.</li>
+        <li><strong>Higher-precision fallbacks:</strong> some operations may run in FP16, BF16, or FP32 instead.</li>
+      </ul>
+      <figure><a href="assets/quantization/execution-cost.png"><img src="assets/quantization/execution-cost.png" width="1190" height="180" loading="lazy" alt="FP32 moves fewer parameters from DRAM directly to compute. The INT8 example moves more parameters but adds an unpack-and-scale step before compute."></a><figcaption>An example of where the extra work can appear. The exact steps depend on the kernel; native INT8 computation may take a different path.</figcaption></figure>
+      <details class="diagram-text"><summary>Read the diagram as text</summary>
+        <p>In the FP32 illustration, a transfer carries two 32-bit parameters from DRAM toward compute. In the INT8 illustration, the same 64 bits carry eight parameters, followed by an unpack-and-scale step before compute. This extra step illustrates possible overhead, rather than a required path for every INT8 kernel.</p>
+      </details>
+      <p>This is the part I find interesting: making the model smaller doesn’t finish the job. We still have to check whether moving fewer bytes and using lower-precision arithmetic saves more time than unpacking, scaling, and conversion take.</p></div></details>
+</section>
+<section class="reader-chapter" id="closing" aria-labelledby="closing-title">
+<h2 id="closing-title" tabindex="-1"><span class="section-kicker">CHAPTER 05</span>Closing</h2>
+<div class="chapter-intro">
+      <p>I wrote this for other CS 61C students who have wondered why learning floating-point representation matters beyond an exam. If you made it this far, I hope the connection to quantization is a little clearer.</p>
+      <p>My interest in quantization grew from trying to understand why a model’s theoretical bit width does not always translate into proportional real-world speedups. A four-bit model may be smaller, but its performance still depends on packing, scales, kernels, memory movement, and hardware support. That’s the question I want to keep exploring.</p>
+    </div>
+<details class="chapter-topic" id="originals"><summary>The original handwritten notes</summary><div class="topic-body">
+      <p>I wrote and drew these notes by hand on my iPad. Here are compressed copies of the original handwritten PDFs:</p>
+      <ul><li><a href="assets/quantization/originals/quantization-part-1.pdf">Part 1 · 14 pages · PDF, 3.6 MB</a></li><li><a href="assets/quantization/originals/quantization-part-2.pdf">Part 2 · 4 pages · PDF, 1.1 MB</a></li></ul></div></details>
+</section>
+    <nav class="chapter-pager" aria-label="Section navigation" hidden><button type="button" id="previous-chapter">← Previous</button><button type="button" id="next-chapter">Next →</button></nav>
+    <footer class="excerpt-end"><p>Written and illustrated by Sneha Muppalla.</p><a href="../blog.html">← Back to blog</a></footer>
+  </main>
+  <script src="reader.js" defer></script>
+</body>
+</html>

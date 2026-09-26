@@ -27,11 +27,11 @@
     </nav>
 <nav class="chapter-links" aria-label="Article chapters"><a href="#beyond-exam"><span class="chapter-number">01</span><span class="chapter-label">Beyond the exam</span></a><a href="#range-and-precision"><span class="chapter-number">02</span><span class="chapter-label">Range & precision</span></a><a href="#understanding-quantization"><span class="chapter-number">03</span><span class="chapter-label">Quantization</span></a><a href="#costs-and-benefits"><span class="chapter-number">04</span><span class="chapter-label">Fewer bits</span></a><a href="#closing"><span class="chapter-number">05</span><span class="chapter-label">Closing</span></a></nav>
 <div class="reader-controls" hidden>
-      <div class="reader-toolbar"><label for="chapter-select">Section</label><select id="chapter-select" aria-label="Choose an article section"><option value="beyond-exam">1. Why floating points matter beyond an exam</option><option value="range-and-precision">2. Range vs precision</option><option value="understanding-quantization">3. What quantization means</option><option value="costs-and-benefits">4. The Costs and Benefits of fewer bits</option><option value="closing">5. Closing</option></select><button type="button" id="reader-mode" aria-pressed="false">Read all</button></div>
+      <div class="reader-toolbar"><label for="chapter-select">Section</label><select id="chapter-select" aria-label="Choose an article section"><option value="beyond-exam">1. Why floating point matters beyond an exam</option><option value="range-and-precision">2. Range vs precision</option><option value="understanding-quantization">3. What quantization means</option><option value="costs-and-benefits">4. The costs and benefits of fewer bits</option><option value="closing">5. Closing</option></select><button type="button" id="reader-mode" aria-pressed="false">Read all</button></div>
       <div class="reader-status"><span id="chapter-status" aria-live="polite"></span><progress id="chapter-progress" max="5" value="1" aria-label="Position in article"></progress></div>
     </div>
 <section class="reader-chapter" id="beyond-exam" aria-labelledby="beyond-exam-title">
-<h2 id="beyond-exam-title" tabindex="-1"><span class="section-kicker">CHAPTER 01</span>Why floating points matter beyond an exam</h2>
+<h2 id="beyond-exam-title" tabindex="-1"><span class="section-kicker">CHAPTER 01</span>Why floating point matters beyond an exam</h2>
 <div class="chapter-intro" id="why">
       <p>As a TA for CS61C, I wanted to write this for students wondering something I also wondered when I took the class: where does floating point actually show up outside an exam?</p>
       <p>If you’ve taken a 61C exam, you have probably converted a decimal number into IEEE 754 by hand:</p>
@@ -52,22 +52,14 @@
       <details class="diagram-text"><summary>Read the diagram as text</summary>
         <p>An FP32 value occupies a 32-bit word:</p><ul><li>Bit 31: one sign bit.</li><li>Bits 30–23: eight exponent bits.</li><li>Bits 22–0: 23 fraction bits.</li></ul><p>The handwritten label “Significand” refers to the stored fraction field. For normalized values, the full significand also includes the implicit leading 1.</p>
       </details>
-      <p>I’ll call the stored field the fraction, although it is sometimes informally called the mantissa in class and online. For normalized values, the significand includes the implicit leading 1.</p>
-      <p>For normalized finite values, the decimal value is:</p>
-      <div class="equation" role="math" aria-label="Negative one to the sign power, times binary one point f, times two to the stored exponent minus bias power">(−1)<sup>s</sup> × (1.f)<sub>2</sub> × 2<sup>e − bias</sup></div>
-      <p>Here, s is the sign bit, f is the stored fraction, and e is the stored exponent. The bias is 127 for FP32. Zero, subnormal values, infinities, and NaNs need separate treatment.</p></div></details>
+      <p>We’ll use this layout in the next chapter to understand the tradeoff between range and precision.</p></div></details>
 <details class="chapter-topic" id="tradeoffs"><summary>Four things to consider</summary><div class="topic-body">
       <p>Given a fixed number of bits, we must decide how to divide them among the sign, exponent, and fraction. That decision affects four properties: range, precision, storage, and hardware execution.</p>
       <dl class="tradeoffs"><div><dt>01 / Range</dt><dd>The span of magnitudes the format can represent.</dd></div><div><dt>02 / Precision</dt><dd>How closely we can distinguish nearby values.</dd></div><div><dt>03 / Storage</dt><dd>How many bytes every value occupies.</dd></div><div><dt>04 / Execution</dt><dd>Hardware instructions that can process the value efficiently.</dd></div></dl>
       <p>These choices have become very visible in machine learning. Modern models can contain millions or billions of parameters. Now if we follow the standard taught in 61C, then each numerical parameter occupies 4 bytes (32 bits).</p></div></details>
 <details class="chapter-topic" id="model-storage"><summary>What if each parameter used fewer bits?</summary><div class="topic-body">
-      <p>Here’s some math: if we have a 1 billion parameter model, then it takes up</p>
-      <div class="equation">10<sup>9</sup> parameters × 4 bytes per parameter ≈ 4 GB</div>
-      <p>I’m counting weights and biases here, using decimal GB. This is just the space for the parameters—we’ll come back to the scales, KV cache, activations, and other memory the model needs to run.</p>
-      <p>What if each parameter occupied 2 bytes? In other words, what would happen if each numerical parameter was represented in 16 bits instead of 32? Then that would approximately halve the storage. And then what about one byte (8 bits)? It reduces the size again by ½ to 1 GB space.</p>
-      <p>These different representations change how much data overall must travel through memory and whether the processor has instructions designed for that datatype (32 bits, 16 bits, 8 bits, etc.).</p>
-      <p>This is why machine learning uses formats such as FP32, FP16, BF16, FP8, INT8. But what do all these names actually mean and why do we need so many formats? Are they simply just cutting off a few decimal places? Not exactly.</p>
-      <p>Each of these formats makes a different compromise in range, memory, precision, and hardware execution. Here’s a diagram of representing one of my favorite numbers (well, it’s in decimal in this case) in 3 ways:</p>
+      <p>With one billion parameters, changing the representation from 32 bits to 16 or 8 bits can save gigabytes of storage. We’ll calculate this more carefully in <a href="#costs-and-benefits">Chapter 4</a>.</p>
+      <p>The same value can be represented differently depending on the format. Here is a preview using 0.93; <a href="#understanding-quantization">Chapter 3</a> explains how each conversion works.</p>
       <figure data-source="Part 1, page 4"><a href="assets/quantization/formats.png"><img src="assets/quantization/formats.png" width="1237" height="980" loading="lazy" alt="0.93 in three formats: FP32 stores approximately 0.9300000072 in 4 bytes, FP16 approximately 0.9301757813 in 2 bytes, and INT8 stores 118 with a shared scale of 1/127, reconstructing approximately 0.92913."></a><figcaption>0.93 in three formats. Tap to view it larger.</figcaption></figure>
       <details class="diagram-text"><summary>Read the diagram as text</summary>
         <p>The mathematical value 0.93 is approximated in three ways:</p><ul><li><strong>FP32:</strong> approximately 0.9300000072, using 4 bytes.</li><li><strong>FP16:</strong> approximately 0.9301757813, using 2 bytes.</li><li><strong>INT8:</strong> integer code 118, using 1 byte plus shared scale metadata. With s = 1/127, q = round(0.93/s) = 118 and x̂ = 118/127 ≈ 0.92913. Code 118 is <code>01110110</code> in binary.</li></ul><p>FP32 and FP16 encode scale through each value’s exponent. INT8 uses separate quantization metadata to reconstruct an approximate real value.</p>
@@ -77,7 +69,9 @@
 <h2 id="range-and-precision-title" tabindex="-1"><span class="section-kicker">CHAPTER 02</span>Range vs precision</h2>
 <div class="chapter-intro" id="range-precision">
       <p>Here’s a quick review of floating point formats from CS61C: floating point formats are able to represent extremely large values and small differences between these nearby values by dividing their available bits into three fields:</p>
+      <p>For normalized finite values, we use:</p>
       <div class="equation">(−1)<sup>s</sup> × (1.f)<sub>2</sub> × 2<sup>e − bias</sup></div>
+      <p>Here, s is the sign bit, e is the stored exponent, and f is the stored fraction. The significand (1.f)<sub>2</sub> includes the implicit leading 1. The bias is 127 for FP32; zero, subnormal values, infinities, and NaNs need separate treatment.</p>
       <p>For ordinary normalized values:</p>
       <ul><li><strong>s</strong> determines sign.</li><li><strong>e</strong> determines scale of the number.</li><li><strong>f</strong> determines precision within that scale.</li></ul>
       <p>A useful interpretation I tell students is that the exponent chooses the general “neighborhood” on this number line, while the fraction f chooses the specific position within that neighborhood.</p>
@@ -197,9 +191,12 @@ w₄₁  w₄₂  w₄₃  w₄₄</code></pre><p>Output features run down the r
       <p>So a system could use:</p><ul><li>Weights: INT8</li><li>Activations: FP16</li><li>KV cache: FP8</li><li>Selected sensitive operations or accumulations: higher precision</li></ul></div></details>
 </section>
 <section class="reader-chapter" id="costs-and-benefits" aria-labelledby="costs-and-benefits-title">
-<h2 id="costs-and-benefits-title" tabindex="-1"><span class="section-kicker">CHAPTER 04</span>The Costs and Benefits of fewer bits</h2>
+<h2 id="costs-and-benefits-title" tabindex="-1"><span class="section-kicker">CHAPTER 04</span>The costs and benefits of fewer bits</h2>
 <div class="chapter-intro" id="fewer-bits">
       <p>During inference, a model’s learned parameters are normally loaded into system / accelerator memory and repeatedly read during execution.</p>
+      <p>For one billion parameters stored in FP32:</p>
+      <div class="equation">10<sup>9</sup> parameters × 4 bytes per parameter ≈ 4 GB</div>
+      <p>I’m counting weights and biases here, using decimal GB. These estimates cover parameter storage only; scales, activations, KV cache, temporary buffers, and runtime overhead add to the total.</p>
       <div class="table-wrap"><table><caption>Storage size for a model with one billion parameters</caption><thead><tr><th scope="col">Format</th><th scope="col">Parameter storage</th></tr></thead><tbody><tr><th scope="row">FP32</th><td>≈ 4 GB</td></tr><tr><th scope="row">FP16 / BF16</th><td>≈ 2 GB</td></tr><tr><th scope="row">INT8</th><td>≈ 1 GB</td></tr><tr><th scope="row">INT4</th><td>≈ 0.5 GB</td></tr></tbody></table></div>
       <p>KV cache is created separately during inference, and stores keys and values from previously processed tokens. As the cache grows with sequence length, batch size, and number of layers, quantizing the KV cache reduces this request-dependent memory, but this is separate from the one billion parameter calculation above.</p>
       <p>A simple breakdown is:</p>

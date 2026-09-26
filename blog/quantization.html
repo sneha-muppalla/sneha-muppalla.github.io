@@ -33,10 +33,11 @@
 <section class="reader-chapter" id="beyond-exam" aria-labelledby="beyond-exam-title">
 <h2 id="beyond-exam-title" tabindex="-1"><span class="section-kicker">CHAPTER 01</span>Why floating points matter beyond an exam</h2>
 <div class="chapter-intro" id="why">
-      <p>Why does converting between decimal and IEEE 754 matter beyond an exam?</p>
+      <p>As a TA for CS61C, I wanted to write this for students wondering something I also wondered when I took the class: where does floating point actually show up outside an exam?</p>
       <p>If you’ve taken a 61C exam, you have probably converted a decimal number into IEEE 754 by hand:</p>
       <ol class="steps"><li>Determine the sign.</li><li>Normalize the binary value.</li><li>Calculate the biased exponent.</li><li>Fill in the fraction bits.</li></ol>
-      <p>It often feels like an isolated mechanical exercise you can master for an exam, instead of an actual decision that affects real software out there.</p>
+      <p>With enough practice, you can get good at those steps and ace the exam question. But that still leaves the question I cared about as a student: what do we actually use this for?</p>
+      <p>Quantization is one example I want to connect back to 61C. The same choices about bits, precision, and range affect how much memory a model needs and how it runs on real hardware.</p>
       <blockquote>BUT, the format used to represent a number changes what a computer can do with it.</blockquote></div>
 <details class="chapter-topic" id="review"><summary>CS61C review</summary><div class="topic-body">
       <p>So far, we have seen fixed-point binary representations and IEEE 754 floating-point representations. As a quick review, a simple 6-bit representation in binary point for positive numbers is:</p>
@@ -233,7 +234,7 @@ w₄₁  w₄₂  w₄₃  w₄₄</code></pre><p>Output features run down the r
 <section class="reader-chapter" id="closing" aria-labelledby="closing-title">
 <h2 id="closing-title" tabindex="-1"><span class="section-kicker">CHAPTER 05</span>Closing</h2>
 <div class="chapter-intro">
-      <p>I wrote this for other CS 61C students who have wondered why learning floating-point representation matters beyond an exam. If you made it this far, I hope the connection to quantization is a little clearer.</p>
+      <p>As a CS61C TA, I want students to see what those floating-point exercises connect to. Quantization is one real-world use of the ideas we teach in class, and it’s the kind of connection I wanted when I was a student.</p>
       <p>My interest in quantization grew from trying to understand why a model’s theoretical bit width does not always translate into proportional real-world speedups. A four-bit model may be smaller, but its performance still depends on packing, scales, kernels, memory movement, and hardware support. That’s the question I want to keep exploring.</p>
     </div>
 <details class="chapter-topic" id="originals"><summary>The original handwritten notes</summary><div class="topic-body">

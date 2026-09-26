@@ -153,3 +153,26 @@ body {
       gap: 0.75rem;
     }
   }
+
+/* Homepage: a short introduction, selected work, and writing. */
+.home-page .container { max-width: 720px; }
+.home-page { color: #283e32; }
+.home-page .name { margin-top: 0; }
+.home-page .intro { font-size: 1.15rem; line-height: 1.65; margin-bottom: 1rem; }
+.home-page .social-links { margin-top: 1.5rem; margin-bottom: 2.8rem; }
+.home-page .publications { margin-top: 2.5rem; }
+.home-page .publications h2 { font-size: 1.4rem; }
+.home-page .publications p { line-height: 1.65; }
+.home-page h3 { font-size: 1.08rem; line-height: 1.5; margin: 0 0 .4rem; }
+.home-page h3 span { font-weight: normal; }
+.home-page .selected-work li { margin-bottom: 1.6rem; }
+.home-page .selected-work p { margin: 0; color: #526055; }
+.home-page .publication-entry { border-top: 1px solid #dde4da; padding-top: 1.1rem; margin-top: 1.8rem; }
+.home-page .home-label { font: .7rem/1.5 Arial, sans-serif; text-transform: uppercase; letter-spacing: .08em; color: #697763; }
+.home-page .publication-entry p { margin-top: .5rem; font-size: .94rem; }
+.home-page .publication-meta { color: #697763; font-size: .85rem; }
+.home-page .featured-writing { background: #f2f5ed; border: 1px solid #e0e6d8; border-radius: 8px; padding: 1.4rem; margin-top: 1.2rem; }
+.home-page .featured-writing h3 { margin-top: .6rem; font-size: 1.3rem; }
+.home-page .featured-writing p { margin: .7rem 0 1rem; }
+.home-page a:focus-visible { outline: 2px solid #0d683e; outline-offset: 4px; }
+@media (max-width: 480px) { .home-page .container { padding-top: 2.5rem; } .home-page .featured-writing { padding: 1rem; } }

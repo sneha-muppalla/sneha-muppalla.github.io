@@ -3,98 +3,55 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Sneha Muppalla — Berkeley EECS and Business student, CS61C TA, and writer interested in efficient machine-learning systems.">
   <title>Sneha Muppalla</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="home-page">
   <main class="container">
+    <header>
+      <h1 class="name">Hi, I’m Sneha.</h1>
+      <p class="intro">I study EECS and Business at UC Berkeley through the M.E.T. program.</p>
+      <p class="intro">I’m interested in efficient machine-learning systems, especially how numerical representations, memory, software, and hardware interact. I also enjoy writing, chocolate, and learning filmmaking.</p>
+      <nav class="social-links" aria-label="Contact and profiles">
+        <a href="mailto:smuppalla06@berkeley.edu">Email</a> ·
+        <a href="https://github.com/sneha-muppalla" target="_blank" rel="noopener noreferrer">GitHub</a> ·
+        <a href="https://www.linkedin.com/in/sneha-muppalla-13b068282/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      </nav>
+    </header>
 
-    <h1 class="name">Sneha Muppalla</h1>
-    <p class="email-link">
-        <a href="mailto:smuppalla06@berkeley.edu">smuppalla06[at]berkeley[dot]edu</a>
-    </p>
-    
-    <p class="intro">
-        Hello Hello! I am an undergraduate student at UC Berkeley studying Electrical Engineering & Computer Sciences (EECS) and Business Administration under the M.E.T. program. 
-    </p>
-
-    <p class="intro">
-        I work on efficient AI systems. I love film, write screenplays, and am learning to make short film
-    </p>
-
-    <div class="social-links">
-      <a href="https://github.com/sneha-muppalla" target="_blank">github</a> ·
-      <a href="https://www.linkedin.com/in/sneha-muppalla-13b068282/" target="_blank">linkedin</a> ·
-      <a href="https://huggingface.co/flying101" target="_blank">huggingface</a> ·
-      <a href="film.html">film</a> ·
-      <a href="blog.html">blog</a> ·
-      <a href="https://www.youtube.com/@snehamuppalla680/playlists" target="_blank">paper readings</a> 
-    </div>
-
-    <!-- Active Research & Industry Roles -->
-    <section class="publications">
-      <h2>Active Work</h2>
-      <ul>
-        <li>
-          <strong>HiPeRLab (UC Berkeley)</strong> — Undergraduate Researcher<br>
-          <span class="details">Developing JAX pipelines and differential optimization frameworks to compute backward-pass gradients and map trajectories through continuous physical boundaries.</span>
-        </li>
-        <li style="margin-top: 1.5rem;">
-          <strong>RunAnywhere</strong> — Engineering Intern<br>
-          <span class="details"> Inference layer: Metal kernels for Apple Silicon, Qualcomm Hexagon NPU, KV-cache optimization, and the Python eval harness.</span>
-        </li>
-        <li style="margin-top: 1.5rem;">
-          <strong>CS 61C Course Staff (UC Berkeley)</strong> — Teaching Assistant <br>
-          <span class="details">Teaching computer architecture fundamentals, focusing on CPU pipeline logic, caches, memory-mapping , and data-level parallelism.</span>
-        </li>
+    <section class="publications" aria-labelledby="work-title">
+      <h2 id="work-title">Selected work</h2>
+      <ul class="selected-work">
+        <li><h3>On-device ML inference <span>— RunAnywhere</span></h3>
+          <p>Worked on deploying and evaluating language and vision models on Apple Silicon and Qualcomm accelerators.</p></li>
+        <li><h3>Asynchronous function calling <span>— Sky Computing Lab</span></h3>
+          <p>Investigating latency and context-processing overhead in synchronous and asynchronous tool-using language models.</p></li>
+        <li><h3>Cooperative aerial transportation <span>— HiPeRLab</span></h3>
+          <p>Working on optimization methods for multi-drone payload transportation.</p></li>
       </ul>
+      <aside class="publication-entry" aria-label="Publication">
+        <span class="home-label">Publication · 2023</span>
+        <p><a href="https://arxiv.org/pdf/2310.03827" target="_blank" rel="noopener noreferrer">Integrating Audio-Visual Features for Multimodal Deepfake Detection</a><br>
+        <span class="publication-meta">Sneha Muppalla, Shan Jia, Siwei Lyu · IEEE MIT URTC</span></p>
+      </aside>
     </section>
 
-    <!-- Specific Technical Projects -->
-    <section class="publications">
-      <h2>Projects & Research</h2>
-      <ul>
-        <li>
-          <strong>Stormscope</strong> — <a href="https://github.com/sneha-muppalla/stormscope-physics-guidance" target="_blank">github</a><br>
-          <span class="details">An extreme weather nowcasting project using physics-guided sampling networks 
-            to track atmospheric anomalies across high-dimensional climate meshes. Built to scale via containerized 
-            cloud environments.</span>
-        </li>
-        <li style="margin-top: 1.5rem;">
-          <strong>VGGT Inference Optimization</strong> —
-          <a href="https://github.com/sneha-muppalla/optimized-vggt-repo" target="_blank">github</a><br>
-          <span class="details">
-            Profiled and optimized inference for VGGT (CVPR 2025 Best Paper) using Nsight Systems. Refactored sequential 
-            frame attention to fused batch processing, implemented early layer 
-            global → frame attention pruning, and enforced FlashAttention-2 via SDPA 
-            with memory contiguity.
-          </span>
-        </li>
-        <li style="margin-top: 1.5rem;">
-          <a href="https://arxiv.org/pdf/2310.03827" target="_blank">
-            Integrating Audio-Visual Features for Multimodal Deepfake Detection
-          </a><br>
-          Sneha Muppalla, Shan Jia, Siwei Lyu<br>
-          <em>IEEE MIT URTC, 2023</em>
-        </li>
-      </ul>
+    <section class="publications" aria-labelledby="writing-title">
+      <h2 id="writing-title">Writing</h2>
+      <article class="featured-writing">
+        <span class="home-label">Illustrated notes · CS 61C</span>
+        <h3><a href="blog/quantization.html">Quantization Through the Lens of CS 61C</a></h3>
+        <p>An illustrated introduction to numerical formats, integer quantization, memory movement, and why smaller models are not automatically faster.</p>
+        <a href="blog/quantization.html">Read the article →</a>
+      </article>
     </section>
 
-    <!-- Core Domains of Interest Section -->
-    <section class="publications">
-      <h2>Interests</h2>
-      <p class="bio" style="margin-bottom: 0; line-height: 1.6;">
-        <strong>Systems & Infrastructure:</strong> Low-level hardware compilation, inference engine efficiency, distributed training optimization, and automatic differentiation frameworks. <br>
-        <span style="display: block; margin-top: 0.5rem;">
-          <strong>Applied Modalities:</strong> Computational earth systems, atmospheric dynamics, planetary data arrays, and accelerated material discovery.
-        </span>
-        <span style="display: block; margin-top: 0.5rem;">
-          <strong>Hobbies:</strong> filmmaking, climbing, basketball, and watching Modern Family.
-        </span>
-      </p>
+    <section class="publications" aria-labelledby="elsewhere-title">
+      <h2 id="elsewhere-title">Elsewhere</h2>
+      <p>When I’m away from my laptop, I’m usually climbing, watching films, writing, or trying to understand how movies are made.</p>
+      <a href="film.html">Films, screenplays, and film notes →</a>
     </section>
-
   </main>
 </body>
 </html>
